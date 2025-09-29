@@ -1,0 +1,29 @@
+[build-system]
+requires = ['hatchling']
+build-backend = 'hatchling.build'
+
+[project]
+name = "namespace"
+version = "0.0.1"
+authors = [
+  { name="Samuel Frederick", email="samuel.frederick@asc.upenn.edu" },
+]
+description = "A package for embedding names."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "transformers",
+    "torch",
+    "numpy", 
+    "pandas" 
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/SamuelFrederick/namespace"
+Issues = "https://github.com/SamuelFrederick/namespace/issues"
