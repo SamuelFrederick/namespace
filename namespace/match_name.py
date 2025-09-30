@@ -9,24 +9,25 @@ class MatchName:
     """
     Class to match names in different formats with different components. 
 
-    Parameters
+    Attributes
     ----------
-    classification_model: str, default "SamFrederick/namematch500k"
-        A classification model to predict whether names match from HuggingFaceHub
-    device: str, optional, default "cpu"
-        Uses cpu for model predictions by default. GPU computations may be faster if available (e.g., 'mps' on Apple Silicon or 'cuda')
-    tokenizer: str, optional, default "roberta-large"
-        The tokenizer to use, compatible with classification_model
-    filter: FilterName, optional, default None
-        An object of class FilterName to first filter datasets to top-k possible matches
+    classification_model : str, default "SamFrederick/namematch500k"
+        A classification model to predict whether names match from HuggingFaceHub.
+    device : str, optional, default "cpu"
+        Uses cpu for model predictions by default. GPU computations may be faster if 
+        available (e.g., 'mps' on Apple Silicon or 'cuda').
+    tokenizer : str, optional, default "roberta-large"
+        The tokenizer to use, compatible with classification_model.
+    filter : FilterName, optional, default None
+        An object of class FilterName to first filter datasets to top-k possible matches.
 
     Examples
     -------
-    Basic name matching on Apple Silicon
+    Basic name matching on Apple Silicon.
 
     >>> matcher = MatchName(classification_model = 'SamFrederick/namematch2m', device = 'mps')
 
-    Filtering names prior to matching
+    Filtering names prior to matching.
 
     >>> filterer = FilterName(embedding_model = 'SamFrederick/namespace1m', k = 3, device = 'mps')
     >>> matcher = MatchName(classification_model = 'SamFrederick/namematch2m', device = 'mps', filter = filterer)
@@ -52,19 +53,19 @@ class MatchName:
         name2: list[str]
     ) -> list[float]:
         """
-        Method to predict whether names match one another
+        Method to predict whether names match one another.
 
         Parameters
         ----------
         name1 : list[str]
-            A string or list of strings containing the left set of names
+            A string or list of strings containing the left set of names.
         name2 : list[str]
-            A string or list of strings containing the right set of names to match to name1
+            A string or list of strings containing the right set of names to match to name1.
         
         Returns 
         -------
         list
-            A list of probabilities that the names match
+            A list of probabilities that the names match.
 
         Examples
         --------
@@ -112,7 +113,7 @@ class MatchName:
 
         return out
 
-    def batch_predict(
+    def _batch_predict(
         self, 
         pairs: list[tuple], 
         batch_size: int = 100
@@ -139,19 +140,19 @@ class MatchName:
         Parameters
         ----------
         names1 : list[str]
-            A list of strings containing the left set of names
+            A list of strings containing the left set of names.
         names2 : list[str], optional
-            A list of strings containing the right set of names to match to names1
+            A list of strings containing the right set of names to match to names1.
 
             If names2 is not provided, the function will classify matches between names1 and itself.
         batch_size: int, default 100
-            An integer determining the number of name pairs in a prediction batch
+            An integer determining the number of name pairs in a prediction batch.
 
         Returns 
         -------
         DataFrame
             A DataFrame with three columns: name1, name2, and prob, where prob indicates the
-             probability that name1 and name2 match
+             probability that name1 and name2 match.
         
         Examples
         -------
@@ -169,7 +170,7 @@ class MatchName:
         else:
             pairs = [(n1, n2) for n1 in names1 for n2 in names2]
 
-        probs = self.batch_predict(pairs, batch_size = batch_size)
+        probs = self._batch_predict(pairs, batch_size = batch_size)
 
         out = []
         for i in range(len(pairs)):
@@ -196,37 +197,37 @@ class MatchName:
 
         Parameters
         ----------
-        df1: DataFrame
-            The left DataFrame to merge
-        df2: DataFrame
-            The right DataFrame to merge
-        how: str, ['inner', 'outer', 'left', 'right']
-            Type of merge to perform
-        left_name_col: str
-            Name of the name column from df1 on which to fuzzy merge
-        right_name_col: str
-            Name of the name column from df2 on which to fuzzy merge
-        left_exact: list[str], optional
-            Name(s) of columns from df1 on which to exact match, if desired
-        right_exact: list[str], optional
-            Name(s) of columns from df2 on which to exact match, if desired
+        df1 : DataFrame
+            The left DataFrame to merge.
+        df2 : DataFrame
+            The right DataFrame to merge.
+        how : str, ['inner', 'outer', 'left', 'right']
+            Type of merge to perform.
+        left_name_col : str
+            Name of the name column from df1 on which to fuzzy merge.
+        right_name_col : str
+            Name of the name column from df2 on which to fuzzy merge.
+        left_exact : list[str], optional
+            Name(s) of columns from df1 on which to exact match, if desired.
+        right_exact : list[str], optional
+            Name(s) of columns from df2 on which to exact match, if desired.
         
             If left_exact is provided but right_exact is not, it is assumed that the
             left_exact columns are the same as right_exact.
-        merge_threshold: float, default 0.5
-            Return merges with name match probabilities at or above this threshold
-        return_marginal: bool, default False
-            Return name matches with "marginal" probabilities for further checking
-        marginal: list[float], default [0.1, 0.9]
-            A list containing the lower and upper limits of what to consider marginal matches
-        batch_size: int, default 100
-            An integer determining the number of name pairs in a prediction batch
+        merge_threshold : float, default 0.5
+            Return merges with name match probabilities at or above this threshold.
+        return_marginal : bool, default False
+            Return name matches with "marginal" probabilities for further checking.
+        marginal : list[float], default [0.1, 0.9]
+            A list containing the lower and upper limits of what to consider marginal matches.
+        batch_size : int, default 100
+            An integer determining the number of name pairs in a prediction batch.
 
         Returns 
         -------
         DataFrame
             A DataFrame containing the merged DataFrames, including a prob column, 
-            indicating the probability that the name columns match
+            indicating the probability that the name columns match.
 
             If return_marginal is True, this will return a second DataFrame with 3 columns
              (name1, name2, prob), including only the "marginal" matches.
@@ -330,31 +331,31 @@ class MatchName:
 
         Parameters
         ----------
-        df: DataFrame
-            The DataFrame to deduplicate
-        name_col: str
-            Name of the name column from df to deduplicate
-        exact: list[str], optional
-            Name(s) of columns from df on which to exact match, if desired
-        merge_threshold: float, default 0.5
-            Return merges with name match probabilities at or above this threshold
-        return_marginal: bool, default False
-            Return name matches with "marginal" probabilities for further checking
-        marginal: list[float], default [0.1, 0.9]
-            A list containing the lower and upper limits of what to consider marginal matches
-        batch_size: int, default 100
-            An integer determining the number of name pairs in a prediction batch
+        df : DataFrame
+            The DataFrame to deduplicate.
+        name_col : str
+            Name of the name column from df to deduplicate.
+        exact : list[str], optional
+            Name(s) of columns from df on which to exact match, if desired.
+        merge_threshold : float, default 0.5
+            Return merges with name match probabilities at or above this threshold.
+        return_marginal : bool, default False
+            Return name matches with "marginal" probabilities for further checking.
+        marginal : list[float], default [0.1, 0.9]
+            A list containing the lower and upper limits of what to consider marginal matches.
+        batch_size : int, default 100
+            An integer determining the number of name pairs in a prediction batch.
 
         Returns 
         -------
         DataFrame
-            A DataFrame containing the deduplicated data, with the deduplicated key in the `full_name` column
+            A DataFrame containing the deduplicated data, with the deduplicated key in the `full_name` column.
 
             If return_marginal is True, this will return a second DataFrame with 3 columns
              (name1, name2, prob), including only the "marginal" matches.
         
         Examples
-        -------
+        --------
         >>> name1 = pd.DataFrame({'name1': [
                 'Jonathan Smith', 'Emily Dickinson',
                 'Emily "Emma" Dickinson',  'Jane Austen', 
@@ -380,8 +381,9 @@ class MatchName:
                 else:
                     tmp[p.name1.iloc[i]] = [p.name2.iloc[i]]
             for k,v in tmp.items():
-                tmp[k] = list(set(v + [y for x in v for y in tmp[x]]))
+                tmp[k] = v + [y for x in v for y in tmp[x]]
                 tmp[k].append(k)
+                tmp[k] = sorted(list(set(tmp[k])))
                 inx = [len(x) for x in tmp[k]]
                 tmp[k] = tmp[k][inx.index(max(inx))]
             tmp = pd.DataFrame([{name_col: k, 'full_name': v} for k,v in tmp.items()])
@@ -423,8 +425,9 @@ class MatchName:
                 else:
                     tmp[p.name1.iloc[i]] = [p.name2.iloc[i]]
             for k,v in tmp.items():
-                tmp[k] = list(set(v + [y for x in v for y in tmp[x]]))
+                tmp[k] = v + [y for x in v for y in tmp[x]]
                 tmp[k].append(k)
+                tmp[k] = sorted(list(set(tmp[k])))
                 inx = [len(x) for x in tmp[k]]
                 tmp[k] = tmp[k][inx.index(max(inx))]
             tmp = pd.DataFrame([{name_col: k, 'full_name': v} for k,v in tmp.items()])

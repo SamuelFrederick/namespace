@@ -41,7 +41,7 @@ embedder.cosine_similarity('John Smith', 'Smith, Jonathan E.')
 
 ## Filtering Names
 
-The FilterName class returns the top k closest nearest neighbors in terms of cosine similarity. 
+The FilterName class returns the closest names in terms of cosine similarity. 
 
 ```python
 from namespace import FilterName

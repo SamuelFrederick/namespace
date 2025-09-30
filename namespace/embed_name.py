@@ -6,15 +6,15 @@ class EmbedName:
     """
     Class to retrieve embeddings for names. 
 
-    Parameters
+    Attributes
     ----------
-    embedding_model: str, default "SamFrederick/namespace500k"
-        A fine-tuned embeddings model from HuggingFaceHub, should be a RoBERTa model
-    tokenizer: str, optional, default "roberta-large"
-        The tokenizer to use, compatible with embedding_model
+    embedding_model : str, default "SamFrederick/namespace500k"
+        A fine-tuned embeddings model from HuggingFaceHub, should be a RoBERTa model.
+    tokenizer : str, optional, default "roberta-large"
+        The tokenizer to use, compatible with embedding_model.
 
     Examples
-    -------
+    --------
     >>> embedder = EmbedName(embedding_model = 'SamFrederick/namespace1m')
 
     """
@@ -34,12 +34,12 @@ class EmbedName:
         Parameters
         ----------
         name : list[str]
-            A list of strings containing the names for which embeddings are desired
+            A list of strings containing the names for which embeddings are desired.
 
         Returns 
         -------
         torch.tensor
-            A torch.tensor containing mean-pooled name embeddings
+            A torch.tensor containing mean-pooled name embeddings.
         
         Examples
         -------
@@ -74,14 +74,14 @@ class EmbedName:
         Parameters
         ----------
         name1 : list[str]
-            A list of strings containing the first set of names to compare
-        name2: list[str]
-            A list of string containing the second set of names to compare
+            A list of strings containing the first set of names to compare.
+        name2 : list[str]
+            A list of string containing the second set of names to compare.
 
         Returns 
         -------
         torch.tensor
-            A torch.tensor containing cosine similarities between names
+            A torch.tensor containing cosine similarities between names.
         
         Examples
         -------
