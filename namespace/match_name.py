@@ -291,11 +291,20 @@ class MatchName:
             elif int(np.min([len(right), len(left)])) == 0:
                 continue
             else:
-                p = self.all_probs(
-                    left.loc[:, left_name_col].unique().tolist(), 
-                    right.loc[:, right_name_col].unique().tolist(), 
-                    batch_size = batch_size
-                )
+                if int(np.max([len(left), len(right)])) ==1:
+                    n1 = left.loc[:, left_name_col].unique().tolist()[0]
+                    n2 = right.loc[:, right_name_col].unique().tolist()[0]
+                    p = pd.DataFrame({
+                        'name1': n1, 
+                        'name2': n2
+                        }, index = [0])
+                    p['prob'] = self.predict_match(n1, n2)
+                else:
+                    p = self.all_probs(
+                        left.loc[:, left_name_col].unique().tolist(), 
+                        right.loc[:, right_name_col].unique().tolist(), 
+                        batch_size = batch_size
+                    )
                 p = p.rename(columns = { 'name1':left_name_col, 'name2': right_name_col})
                 
                 if return_marginal:
