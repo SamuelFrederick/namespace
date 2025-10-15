@@ -8,15 +8,15 @@ For name matching, MNRL fine-tuned model weights were further fine-tuned for mat
 
 ## Recommended Model Weights
 
-Recommended model weights are available [here](https://huggingface.co/SamuelFrederick). 
+Recommended model weights are available [here](https://huggingface.co/SamFrederick). 
 
 | Model                                                                 | Training Size | Base Model    |
 | --------------------------------------------------------------------- | ------------- | ------------- |
-| [namespace500k](https://huggingface.co/SamuelFrederick/namespace500k) | 500,000       | RoBERTa Large |
-| [namespace1m](https://huggingface.co/SamuelFrederick/namespace1m)     | 1,000,000     | RoBERTa Large |
-| [namematch500k](https://huggingface.co/SamuelFrederick/namematch500k) | 500,000       | namespace500k |
-| [namematch1m](https://huggingface.co/SamuelFrederick/namematch1m)     | 1,000,000     | namespace1m   |
-| [namematch2m](https://huggingface.co/SamuelFrederick/namematch2m)     | 2,000,000     | namespace1m   |
+| [namespace500k](https://huggingface.co/SamFrederick/namespace500k) | 500,000       | RoBERTa Large |
+| [namespace1m](https://huggingface.co/SamFrederick/namespace1m)     | 1,000,000     | RoBERTa Large |
+| [namematch500k](https://huggingface.co/SamFrederick/namematch500k) | 500,000       | namespace500k |
+| [namematch1m](https://huggingface.co/SamFrederick/namematch1m)     | 1,000,000     | namespace1m   |
+| [namematch2m](https://huggingface.co/SamFrederick/namematch2m)     | 2,000,000     | namespace1m   |
 
 
 # Usage
