@@ -290,7 +290,7 @@ class MatchName:
             if how !='right': 
                 left = frame.iloc[[i]].merge(df1, how = 'left', left_on = left_exact, right_on = left_exact, indicator = True)
             else:
-                left = frame.iloc[[i]].merge(df1, how = 'left', left_on = left_exact, right_on = right_exact, indicator = True)
+                left = frame.iloc[[i]].merge(df1, how = 'left', left_on = right_exact, right_on = left_exact, indicator = True)
             left = left[left._merge=='both'].drop('_merge', inplace = False, axis = 1)
             if how!='left':
                 right = frame.iloc[[i]].merge(df2, how = 'left', left_on = right_exact, right_on = right_exact, indicator = True)
