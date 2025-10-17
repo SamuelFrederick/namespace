@@ -190,7 +190,8 @@ class MatchName:
         merge_threshold: float = 0.5, 
         return_marginal: bool = False,
         marginal: list[float] = [0.1, 0.9], 
-        batch_size: int = 100
+        batch_size: int = 100, 
+        crosswalk: bool = False
     ) -> pd.DataFrame:
         """
         Method to fuzzy merge two datasets containing names in different formats. 
@@ -222,6 +223,8 @@ class MatchName:
             A list containing the lower and upper limits of what to consider marginal matches.
         batch_size : int, default 100
             An integer determining the number of name pairs in a prediction batch.
+        crosswalk : bool, default False
+            A boolean indicating whether or not to return a crosswalk (subsets to only merge columns)
 
         Returns 
         -------
@@ -267,22 +270,32 @@ class MatchName:
             right_exact = left_exact
             
         if how == 'left': 
-            frame = df1.copy().loc[:, left_exact].drop_duplicates()
+            frame = df1.copy().loc[:, left_exact].drop_duplicates().reset_index(drop = True)
         elif how == 'right': 
-            frame = df2.copy().loc[:, right_exact].drop_duplicates()
+            frame = df2.copy().loc[:, right_exact].drop_duplicates().reset_index(drop = True)
         elif how == 'inner': 
             frame = df1.copy().loc[:, left_exact].drop_duplicates()
-            frame = frame.merge(df2.loc[:, right_exact].drop_duplicates(), how = 'inner', left_on = left_exact, right_on = right_exact)
+            frame = frame.merge(df2.loc[:, right_exact].drop_duplicates(), how = 'inner', left_on = left_exact, right_on = right_exact).drop_duplicates().reset_index(drop = True)
         elif how == 'outer': 
             frame = df1.copy().loc[:, left_exact].drop_duplicates()
-            frame = frame.merge(df2.loc[:, right_exact].drop_duplicates(), how = 'outer', left_on = left_exact, right_on = right_exact)
+            frame = frame.merge(df2.loc[:, right_exact].drop_duplicates(), how = 'outer', left_on = left_exact, right_on = right_exact).drop_duplicates().reset_index(drop = True)
+
+        if crosswalk:
+            df1 = df1.loc[:, [left_name_col] + left_exact]
+            df2 = df2.loc[:, [right_name_col] + right_exact]
 
         out = []
         marginal_out = []
         for i in range(len(frame)):
-            left = frame.iloc[[i]].merge(df1, how = 'left', left_on = left_exact, right_on = left_exact, indicator = True)
+            if how !='right': 
+                left = frame.iloc[[i]].merge(df1, how = 'left', left_on = left_exact, right_on = left_exact, indicator = True)
+            else:
+                left = frame.iloc[[i]].merge(df1, how = 'left', left_on = left_exact, right_on = right_exact, indicator = True)
             left = left[left._merge=='both'].drop('_merge', inplace = False, axis = 1)
-            right = frame.iloc[[i]].merge(df2, how = 'left', left_on = right_exact, right_on = right_exact, indicator = True)
+            if how!='left':
+                right = frame.iloc[[i]].merge(df2, how = 'left', left_on = right_exact, right_on = right_exact, indicator = True)
+            else:
+                right = frame.iloc[[i]].merge(df2, how = 'left', left_on = left_exact, right_on = right_exact, indicator = True)
             right = right[right._merge=='both'].drop('_merge', inplace = False, axis = 1)
             if len(right)==0 and how in ['left', 'outer']:
                 out.append(left)
@@ -312,12 +325,29 @@ class MatchName:
                 p = p[p.prob>=merge_threshold]
                 left = left.merge(p, on = left_name_col, how = 'left')
                 right = right.merge(p, on = right_name_col, how = 'left')
-                o = left.merge(right, left_on = [left_name_col, right_name_col, 'prob'] + left_exact, right_on = [left_name_col, right_name_col, 'prob'] + right_exact, how = how)
+
+
+                lm = rm = [left_name_col, right_name_col, 'prob'] 
+                if how == 'left':
+                    rm += left_exact
+                elif how == 'right': 
+                    lm += right_exact
+                else:
+                    lm += left_exact + right_exact
+                    rm += left_exact + right_exact
+
+
+                o = left.merge(
+                    right, 
+                    left_on = lm, 
+                    right_on = rm, 
+                    how = how
+                )
                 out.append(o)
 
-        out = pd.concat(out)
+        out = pd.concat(out).reset_index(drop = True)
         if return_marginal:
-            marginal_out = pd.concat(marginal_out)
+            marginal_out = pd.concat(marginal_out).reset_index(drop = True)
             return out, marginal_out
 
         return out
