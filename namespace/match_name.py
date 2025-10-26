@@ -288,14 +288,18 @@ class MatchName:
         marginal_out = []
         for i in range(len(frame)):
             if how !='right': 
-                left = frame.iloc[[i]].merge(df1, how = 'left', left_on = left_exact, right_on = left_exact, indicator = True)
+                left = frame.iloc[[i]].to_frame() if isinstance(frame, pd.Series) else frame.iloc[[i]]
+                left = left.merge(df1, how = 'left', left_on = left_exact, right_on = left_exact, indicator = True)
             else:
-                left = frame.iloc[[i]].merge(df1, how = 'left', left_on = right_exact, right_on = left_exact, indicator = True)
+                left = frame.iloc[[i]].to_frame() if isinstance(frame, pd.Series) else frame.iloc[[i]]
+                left = left.merge(df1, how = 'left', left_on = right_exact, right_on = left_exact, indicator = True)
             left = left[left._merge=='both'].drop('_merge', inplace = False, axis = 1)
             if how!='left':
-                right = frame.iloc[[i]].merge(df2, how = 'left', left_on = right_exact, right_on = right_exact, indicator = True)
+                right = frame.iloc[[i]].to_frame() if isinstance(frame, pd.Series) else frame.iloc[[i]]
+                right = right.merge(df2, how = 'left', left_on = right_exact, right_on = right_exact, indicator = True)
             else:
-                right = frame.iloc[[i]].merge(df2, how = 'left', left_on = left_exact, right_on = right_exact, indicator = True)
+                right = frame.iloc[[i]].to_frame() if isinstance(frame, pd.Series) else frame.iloc[[i]]
+                right = right.merge(df2, how = 'left', left_on = left_exact, right_on = right_exact, indicator = True)
             right = right[right._merge=='both'].drop('_merge', inplace = False, axis = 1)
             if len(right)==0 and how in ['left', 'outer']:
                 out.append(left)
@@ -443,7 +447,8 @@ class MatchName:
         out = []
         marginal_out = []
         for i in range(len(frame)):
-            mn = frame.iloc[[i]].merge(df, how = 'left', on = exact)
+            mn = frame.iloc[[i]].to_frame() if isinstance(frame, pd.Series) else frame.iloc[[i]]
+            mn = mn.merge(df, how = 'left', on = exact)
             if len(mn)==1:
                 mn['full_name'] = mn[name_col].iloc[0]
                 out.append(mn)
@@ -478,9 +483,9 @@ class MatchName:
                 validate = 'one_to_one'
             ))
 
-        out = pd.concat(out)
+        out = pd.concat(out).reset_index(drop = True)
         if return_marginal:
-            marginal_out = pd.concat(marginal_out)
+            marginal_out = pd.concat(marginal_out).reset_index(drop = True)
             return out, marginal_out
 
         return out
